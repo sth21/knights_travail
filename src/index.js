@@ -86,5 +86,3 @@ const gameBoard = (() => {
 })();
 
 export default gameBoard;
-
-gameBoard.knightMoves([0, 0], [0, 1]);
