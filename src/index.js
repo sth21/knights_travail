@@ -26,7 +26,7 @@ const gameBoard = (() => {
                 break;
             }
         }
-        let queue = [source];
+        const queue = [source];
         while (queue.length > 0) {
             for (const move in knight) {
                 let adjacentNode = knight[move](queue[0]);
@@ -43,7 +43,48 @@ const gameBoard = (() => {
         return source;
     };
 
-    return { board, makeGraph } 
+    const searchGraph = (graph, start, target) => {
+        let source;
+        for (const node of board) {
+            if (node.position[0] === start[0] && node.position[1] === start[1]) source = node;
+        }
+        source.distance = 0;
+        if (source.position[0] === target[0] && source.position[1] === target[1]) return source;
+        const queue = [source];
+        while (queue.length > 0) {
+            for (const neighbor of queue[0].adjacencyList) {
+                if (neighbor.distance === Infinity) {
+                    neighbor.distance = queue[0].distance + 1;
+                    if (neighbor.position[0] === target[0] && neighbor.position[1] === target[1]) return neighbor;
+                    queue.push(neighbor);
+                }
+            }
+            queue.shift();
+        }
+    };
+
+    const printPath = (endNode) => {
+        console.log(`You made it in ${endNode.distance} moves! Here's your path:`);
+        const LENGTH = endNode.distance + 1;
+        const path = [];
+        for (let i = 0; i < LENGTH; ++i) {
+            path.unshift(`[${endNode.position.join(', ')}]`);
+            endNode = endNode.previous;
+        }
+        for (const step of path) {
+            console.log(step);
+        }
+    };
+
+    const knightMoves = (startpos, endpos) => {
+        const graph = makeGraph(startpos);
+        const path = searchGraph(graph, startpos, endpos);
+        return printPath(path);
+    };
+
+    return { board, knightMoves }; 
 })();
 
 export default gameBoard;
+
+gameBoard.knightMoves([0, 0], [0, 1]);
